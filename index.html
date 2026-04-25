@@ -28,7 +28,18 @@
             </div>
             <div class="pera1-removable u-mbmd">
               <div data-structure="e-text" class="pera1-editable"><div>
-<span id="text"></span>
+<body>
+  <p>今日の日付は<span id="text"></span>日です</p>
+
+  <script type="text/javascript">
+    document.getElementById("text").innerHTML = showDay();
+  function showDay() {
+    var now = new Date();
+    var day = now.getDate();
+    return day;
+  }
+  </script>
+  </body>
 <p>~気ままに過ごせる空間をあなたに！~</p>
 <h1>〜概要紹介〜</h1>
 <p>🌟トークバラエティ豊富！いろんな話題喋れます。🌟</p>
