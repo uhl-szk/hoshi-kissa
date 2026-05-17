@@ -198,8 +198,8 @@
 <p>カフェのようにふらっと立ち寄れ！自由な過ごし方ができるサーバーです。</p>
 <h1>"【あなたはどのように過ごしますか？】"</h1>
 <p>そこのあなたも入ってみませんか？</p>
-<p>現在の合計参加人数：376人 (5/17 9:30更新)</p>
-<p>Bot：32人・人間：344人</p>                
+<p data-discord-total-count>現在の合計参加人数：376人 (5/17 9:30更新)</p>
+<p data-discord-breakdown data-bot-count="32">Bot：32人・人間：344人</p>
 </div></div>
             </div>
             <div class="c-btn c-btn--round u-mbmd pera1-removable"><a class="pera1-editable" href="https://discord.com/invite/a26JJr3hVz" data-structure="e-btn" target="_self">Discordサーバーはこちら</a>
@@ -263,62 +263,5 @@
             </div>
           </div>
         </div>
-<script id="hoshi-view-mode-script">
-  (function () {
-    var storageKey = "hoshiViewMode";
-    var root = document.documentElement;
-    var viewport = document.querySelector('meta[name="viewport"]');
-    var buttons = document.querySelectorAll("[data-view-mode-button]");
-
-    function saveMode(mode) {
-      try {
-        window.localStorage.setItem(storageKey, mode);
-      } catch (error) {
-        return;
-      }
-    }
-
-    function loadMode() {
-      try {
-        return window.localStorage.getItem(storageKey);
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function requestedMode() {
-      try {
-        var mode = new URLSearchParams(window.location.search).get("view");
-        return mode === "pc" || mode === "sp" ? mode : null;
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function setMode(mode) {
-      var nextMode = mode === "pc" ? "pc" : "sp";
-      root.setAttribute("data-view-mode", nextMode);
-
-      if (viewport) {
-        viewport.setAttribute("content", nextMode === "pc" ? "width=1100" : "width=device-width, initial-scale=1");
-      }
-
-      buttons.forEach(function (button) {
-        button.setAttribute("aria-pressed", button.getAttribute("data-view-mode-button") === nextMode ? "true" : "false");
-      });
-
-      saveMode(nextMode);
-    }
-
-    buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        setMode(button.getAttribute("data-view-mode-button"));
-      });
-    });
-
-    var savedMode = loadMode();
-    var initialMode = requestedMode() || (savedMode === "pc" || savedMode === "sp" ? savedMode : null);
-    setMode(initialMode || (window.innerWidth <= 480 ? "sp" : "pc"));
-  })();
-</script>
+<script src="./main.js"></script>
 </body>
