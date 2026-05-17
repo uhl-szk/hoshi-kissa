@@ -75,6 +75,30 @@
     font-size: 1.1em;
   }
 
+  .history-entry {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+  }
+
+  .history-entry--wide {
+    gap: 0.75em;
+    font-size: 0.95em;
+    white-space: nowrap;
+  }
+
+  .history-date {
+    flex: 0 0 auto;
+  }
+
+  .history-event {
+    min-width: 0;
+  }
+
+  .history-sp-break {
+    display: none;
+  }
+
   html[data-view-mode="sp"] {
     background: #dfe9ef;
   }
@@ -104,6 +128,30 @@
 
   html[data-view-mode="sp"] #section-17 .p-main {
     padding-top: 54px;
+  }
+
+  html[data-view-mode="sp"] .history-entry {
+    display: block;
+    margin: 0.7em 0;
+  }
+
+  html[data-view-mode="sp"] .history-entry--wide {
+    font-size: 1em;
+    white-space: normal;
+  }
+
+  html[data-view-mode="sp"] .history-date,
+  html[data-view-mode="sp"] .history-event {
+    display: block;
+  }
+
+  html[data-view-mode="sp"] .history-date {
+    margin-bottom: 0.1em;
+    font-weight: 700;
+  }
+
+  html[data-view-mode="sp"] .history-sp-break {
+    display: initial;
   }
 
   @media (max-width: 480px) {
@@ -172,13 +220,13 @@
               <div class="p-sentence-letter__text pera1-removable history-text" data-transform-translate="" style="--user-transform-translate-x-desktop: 2px;--user-transform-translate-y-desktop: 9px;">
                 <div data-custom-pc-fontsize="5px" data-structure="e-text" class="pera1-editable">
                   <p class="history-text__title">サーバーの歴史</p>
-                  <p>2025年10月27日　当サーバー設立</p>
-                  <p>2025年11月15日　サーバー一般公開</p>
-                  <p>2026年4月11日　300人達成</p>
-                  <p>2026年4月23日~4月25日<br>サーバータグ∶気まま。ロールがグラデーションロールに</p>
-                  <p>2026年4月26日　サーバー内のユーザー300人達成</p>
-                  <p>2026年5月5日　合計メッセージ数20万突破</p>
-                  <p>2026年5月17日　現在の参加人数376人</p>
+                  <p class="history-entry"><span class="history-date">2025年10月27日</span><span class="history-event">当サーバー設立</span></p>
+                  <p class="history-entry"><span class="history-date">2025年11月15日</span><span class="history-event">サーバー一般公開</span></p>
+                  <p class="history-entry"><span class="history-date">2026年4月11日</span><span class="history-event">300人達成</span></p>
+                  <p class="history-entry history-entry--wide"><span class="history-date">2026年4月23日~4月25日</span><span class="history-event">サーバータグ∶気まま。ロールが<br class="history-sp-break">グラデーションロールに</span></p>
+                  <p class="history-entry"><span class="history-date">2026年4月26日</span><span class="history-event">サーバー内のユーザー300人達成</span></p>
+                  <p class="history-entry"><span class="history-date">2026年5月5日</span><span class="history-event">合計メッセージ数20万突破</span></p>
+                  <p class="history-entry"><span class="history-date">2026年5月17日</span><span class="history-event">現在の参加人数376人</span></p>
                   <p>順次更新予定(遅れる場合があります)</p>
                 </div>
               </div>
@@ -224,46 +272,6 @@
             </div>
           </div>
         </div>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script id="tmpl_nav" type="text/x-template">
           <ul class="nav nav-pills nav-stacked">
           <% _.each(sections, function(section) { %>
