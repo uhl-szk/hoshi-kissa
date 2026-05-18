@@ -1,18 +1,30 @@
-<body>
-  <span id="text">現在時刻</span>
+(function () {
+  function formatTime(date) {
+    var hours = String(date.getHours()).padStart(2, "0");
+    var minutes = String(date.getMinutes()).padStart(2, "0");
+    var seconds = String(date.getSeconds()).padStart(2, "0");
 
-  <script type="text/javascript">
-  document.getElementById("text").innerHTML = showTime();
-  
-  function showTime() {
-    var now = new Date();
-    var nowhour = now.getHours();
-    var nowminutes = now.getMinutes();
-    var nowseconds = now.getSeconds();
-  
-    var text = nowhour + "：" + nowminutes + "：" + nowseconds; 
-    
-    return text;
+    return hours + ":" + minutes + ":" + seconds;
   }
-  </script>
-  </body>
+
+  function startClock() {
+    var textElement = document.getElementById("text");
+
+    if (!textElement) {
+      return;
+    }
+
+    function updateTime() {
+      textElement.textContent = formatTime(new Date());
+    }
+
+    updateTime();
+    window.setInterval(updateTime, 1000);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startClock);
+  } else {
+    startClock();
+  }
+})();
