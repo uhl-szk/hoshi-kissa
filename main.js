@@ -76,7 +76,6 @@
   }
 
   var botCount = readCount(breakdownElement, "data-bot-count") || 0;
-  var exactHumanCount = readCount(breakdownElement, "data-human-count");
   var exactTotalCount = readCount(totalElement, "data-total-count");
   var shouldAutoUpdate = totalElement.getAttribute("data-auto-count") === "true";
   var discordApiUrl = "https://discord.com/api/v10/invites/" + inviteCode + "?with_counts=true&with_expiration=true";
@@ -98,19 +97,23 @@
     return parts.month + "/" + parts.day + " " + parts.hour + ":" + parts.minute;
   }
 
-  function renderCount(totalCount, humanCount, updatedAt) {
+  function calculateHumanCount(totalCount) {
+    return Math.max(totalCount - botCount, 0);
+  }
+
+  function renderCount(totalCount, updatedAt) {
+    var humanCount = calculateHumanCount(totalCount);
+
     totalElement.textContent = "現在の合計参加人数：" + totalCount + "人 (" + updatedAt + "更新)";
     breakdownElement.textContent = "Bot：" + botCount + "人・人間：" + humanCount + "人";
   }
 
   function updateCount(totalCount) {
-    var humanCount = Math.max(totalCount - botCount, 0);
-    renderCount(totalCount, humanCount, formatUpdatedAt(new Date()));
+    renderCount(totalCount, formatUpdatedAt(new Date()));
   }
 
-  if (exactHumanCount !== null) {
-    // Discord招待の参加人数は概算のため、手動確認した人間の人数を優先する。
-    renderCount(exactTotalCount !== null ? exactTotalCount : botCount + exactHumanCount, exactHumanCount, formatUpdatedAt(new Date()));
+  if (exactTotalCount !== null) {
+    renderCount(exactTotalCount, formatUpdatedAt(new Date()));
     return;
   }
 
