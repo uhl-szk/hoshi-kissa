@@ -71,13 +71,32 @@
       return null;
     }
 
+    // まずそのまま数値化を試みる
     var count = Number(value);
-    return Number.isFinite(count) ? count : null;
+    if (Number.isFinite(count)) {
+      return count;
+    }
+
+    // 数字が混在する文字列の場合、最初の連続した数字列を抽出して数値化する
+    var m = String(value).match(/\d+/);
+    if (m) {
+      var n = Number(m[0]);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    return null;
+  }
+
+  function readCorrection(element, attributeName) {
+    var count = readCount(element, attributeName);
+    return count === null ? 0 : Math.max(0, Math.floor(count));
   }
 
   var botCount = readCount(breakdownElement, "data-bot-count") || 0;
   var exactTotalCount = readCount(totalElement, "data-total-count");
   var shouldAutoUpdate = totalElement.getAttribute("data-auto-count") === "true";
+  var totalSubtract = readCorrection(totalElement, "data-subtract");
+  var humanSubtract = readCorrection(breakdownElement, "data-human-subtract");
   var discordApiUrl = "https://discord.com/api/v10/invites/" + inviteCode + "?with_counts=true&with_expiration=true";
   var countApiUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(discordApiUrl);
 
@@ -98,13 +117,14 @@
   }
 
   function calculateHumanCount(totalCount) {
-    return Math.max(totalCount - botCount, 0);
+    return Math.max(totalCount - botCount - humanSubtract, 0);
   }
 
   function renderCount(totalCount, updatedAt) {
+    var displayTotal = Math.max(totalCount - totalSubtract, 0);
     var humanCount = calculateHumanCount(totalCount);
 
-    totalElement.textContent = "現在の合計参加人数：" + totalCount + "人 (" + updatedAt + "更新)";
+    totalElement.textContent = "現在の合計参加人数：" + displayTotal + "人 (" + updatedAt + "更新)";
     breakdownElement.textContent = "Bot：" + botCount + "人・人間：" + humanCount + "人";
   }
 
