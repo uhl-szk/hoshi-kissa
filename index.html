@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#"><meta charset="utf-8">
 <title>ほし喫茶☕Discordサーバー</title>
 <meta name="description" content="気になったら入ってみませんか？新規さんでも馴染みやすいサーバーです！">
@@ -19,19 +19,19 @@
 </style>
 <link href="./hoshi-local-fixes.css" rel="stylesheet">
 </head>
-  <body class="theme-blank theme-custom theme-base template-theme-default fp_fp-koburina_go_std_n-w3" data-template-name="blank" style="overflow: auto; padding-top: 0px;" data-is-initial-val-of-template-theme="0" data-is-available-on-template-theme="true">
+  <body class="theme-blank theme-custom theme-base template-theme-default fp_fp-koburina_go_std_n-w3" data-template-name="blank" data-is-initial-val-of-template-theme="0" data-is-available-on-template-theme="true">
     <nav class="view-switcher" aria-label="表示切り替え">
       <button class="view-switcher__button" type="button" data-view-mode-button="pc" aria-pressed="false">PC版</button>
       <button class="view-switcher__button" type="button" data-view-mode-button="sp" aria-pressed="false">スマホ版</button>
     </nav>
         <div class="pera1-section block" data-structure="b-main-set-2--left" data-block-name="メイン(左寄せ+ボタン)" id="section-17" data-optional-block-settings-key="0">
-  <div class="c-bg-img c-bg-img--cover pera1-bg-editable" style="background-repeat: no-repeat; background-position: 0% 25.251%; background-size: cover; background-color: rgb(29, 32, 136); --block-bg-color: #1D2088;" data-bg-key="0" data-bgcolor="#1D2088" data-custom-pc-only-bgimg="">
+  <div class="c-bg-img c-bg-img--cover pera1-bg-editable hoshi-main-bg" data-bg-key="0" data-bgcolor="#1D2088" data-custom-pc-only-bgimg="">
     <div class="grid-wrapper">
       <div class="row middle-xs start-sm center-xs p-main">
         <div class="col-sm-6 col-xs-12">
           <div class="c-inner c-inner--xl c-inner--vertical u-color-white">
             <div class="p-main-set-2--left__heading c-heading c-heading--lg u-mbmd pera1-removable">
-              <h2 data-custom-pc-fontsize="16px" data-structure="e-heading" class="pera1-editable"><div><strong>Discordサーバー</strong><br><span style="font-size: 36px;"><strong>ほし喫茶☕</strong></span></div></h2>
+              <h2 data-custom-pc-fontsize="16px" data-structure="e-heading" class="pera1-editable"><strong>Discordサーバー</strong><br><span class="hoshi-title-name"><strong>ほし喫茶☕</strong></span></h2>
             </div>
             <div class="pera1-removable u-mbmd">
               <div data-structure="e-text" class="pera1-editable"><div>
@@ -44,6 +44,8 @@
 <p>カフェのようにふらっと立ち寄れ！自由な過ごし方ができるサーバーです。</p>
 <h1>"【あなたはどのように過ごしますか？】"</h1>
 <p>そこのあなたも入ってみませんか？</p>
+<!-- 注意: Discord APIで取得した人数をサイト表示に合わせて補正するための設定です。
+ data-subtract は合計表示用、data-bot-count は固定Bot数、data-human-subtract は人間数だけから引く補正値です。 -->
 <p data-discord-total-count data-auto-count="true" data-subtract="2">現在の合計参加人数：(取得中)</p>
 <p data-discord-breakdown data-bot-count="33" data-human-subtract="1">Bot：(取得中)・人間：(取得中)</p>
 </div></div>
@@ -62,8 +64,8 @@
         <div class="p-sentence-letter">
           <div class="p-sentence-letter__contents u-mtmd--sp">
             <div class="p-sentence-letter__body u-mtmd--sp">
-              
-              <div class="p-sentence-letter__text pera1-removable history-text" data-transform-translate="" style="--user-transform-translate-x-desktop: 2px;--user-transform-translate-y-desktop: 9px;">
+
+              <div class="p-sentence-letter__text pera1-removable history-text" data-transform-translate="">
                 <div data-custom-pc-fontsize="5px" data-structure="e-text" class="pera1-editable">
                   <p class="history-text__title">サーバーの歴史</p>
                   <p class="history-entry"><span class="history-date">2025年10月27日</span><span class="history-event">当サーバー設立</span></p>
@@ -86,8 +88,8 @@
   <div class="c-bg-img c-bg-img--cover pera1-bg-editable" data-bg-key="2">
     <div class="c-wrapper u-align-center">
       <div class="p-heading-has-subtitle p-heading__inner">
-        <div class="p-heading-has-subtitle__main c-heading c-heading--bdr-btm pera1-removable" data-transform-translate="{&quot;desktop&quot;:{&quot;x&quot;:-11,&quot;y&quot;:-1}}" style="--user-transform-translate-x-desktop: -11px;--user-transform-translate-y-desktop: -1px;">
-          <h2 data-structure="e-heading" class="pera1-editable"><div><strong>サーバーの特徴<br></strong></div></h2>
+        <div class="p-heading-has-subtitle__main c-heading c-heading--bdr-btm pera1-removable hoshi-feature-heading" data-transform-translate="{&quot;desktop&quot;:{&quot;x&quot;:-11,&quot;y&quot;:-1}}">
+          <h2 data-structure="e-heading" class="pera1-editable"><strong>サーバーの特徴<br></strong></h2>
         </div>
         <div class="p-heading-has-subtitle__sub pera1-removable">
           <div data-structure="e-text" class="pera1-editable"><div><strong>サーバータグ⇒気まま。があります。</strong></div>
@@ -98,7 +100,7 @@
   </div>
 </div><div class="s_footer-peraichi pera1-section block" data-structure="b-footer" data-block-name="フッター" id="section-1" data-optional-block-settings-key="3">
           <div class="c-bg-img c-bg-img--cover pera1-bg-editable" data-bg-key="3">
-            <div class="c-wrapper c-wrapper">
+            <div class="c-wrapper">
               <div class="p-footer__inner">
                 <div class="u-align-center">
                       <div data-structure="e-text" class="pera1-editable"><div>2026©︎ほし喫茶</div>
@@ -108,6 +110,6 @@
               </div>
             </div>
           </div>
-        </div>
 <script src="./main.js?v=20260518-count-formula"></script>
 </body>
+</html>

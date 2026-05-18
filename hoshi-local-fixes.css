@@ -32,12 +32,31 @@
   background: #1d2088;
 }
 
+body {
+  overflow: auto;
+  padding-top: 0;
+}
+
+.hoshi-main-bg {
+  --block-bg-color: #1d2088;
+  background-color: #1d2088;
+  background-position: 0% 25.251%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hoshi-title-name {
+  font-size: 36px;
+}
+
 .history-text,
 .history-text * {
   box-sizing: border-box;
 }
 
 .history-text {
+  --user-transform-translate-x-desktop: 2px;
+  --user-transform-translate-y-desktop: 9px;
   max-width: 100%;
   padding: 0 8px;
   font-size: clamp(13px, 2.7vw, 16px);
@@ -84,6 +103,11 @@
 
 .history-sp-break {
   display: none;
+}
+
+.hoshi-feature-heading {
+  --user-transform-translate-x-desktop: -11px;
+  --user-transform-translate-y-desktop: -1px;
 }
 
 html[data-view-mode="sp"] {
