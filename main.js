@@ -100,7 +100,7 @@
 
   function renderCount(totalCount, humanCount, updatedAt) {
     totalElement.textContent = "現在の合計参加人数：" + totalCount + "人 (" + updatedAt + "更新)";
-    breakdownElement.textContent = "Bot：" + botCount + "人：" + humanCount + "人";
+    breakdownElement.textContent = "Bot：" + botCount + "人・人間：" + humanCount + "人";
   }
 
   function updateCount(totalCount) {
