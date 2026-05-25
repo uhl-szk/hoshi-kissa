@@ -95,7 +95,6 @@
   var botCount = readCount(breakdownElement, "data-bot-count") || 0;
   var exactTotalCount = readCount(totalElement, "data-total-count");
   var shouldAutoUpdate = totalElement.getAttribute("data-auto-count") === "true";
-  var totalSubtract = readCorrection(totalElement, "data-subtract");
   var humanSubtract = readCorrection(breakdownElement, "data-human-subtract");
   var discordApiUrl = "https://discord.com/api/v10/invites/" + inviteCode + "?with_counts=true&with_expiration=true";
   var countApiUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(discordApiUrl);
@@ -121,8 +120,10 @@
   }
 
   function renderCount(totalCount, updatedAt) {
-    var displayTotal = Math.max(totalCount - totalSubtract, 0);
     var humanCount = calculateHumanCount(totalCount);
+    var displayTotal = botCount + humanCount;
+    var totalSubtract = Math.max(totalCount - displayTotal, 0);
+    totalElement.setAttribute("data-subtract", String(totalSubtract));
 
     totalElement.textContent = "現在の合計参加人数：" + displayTotal + "人 (" + updatedAt + "更新)";
     breakdownElement.textContent = "Bot：" + botCount + "人・人間：" + humanCount + "人";
