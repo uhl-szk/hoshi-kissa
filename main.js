@@ -121,6 +121,7 @@
 
   function renderCount(totalCount, updatedAt) {
     var humanCount = calculateHumanCount(totalCount);
+    // 合計表示は内訳と必ず一致させるため、API取得値ではなくBot数+人間数で表示する。
     var displayTotal = botCount + humanCount;
     var totalSubtract = Math.max(totalCount - displayTotal, 0);
     totalElement.setAttribute("data-subtract", String(totalSubtract));
