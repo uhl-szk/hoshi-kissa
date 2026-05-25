@@ -1,0 +1,45 @@
+# 依存関係
+node_modules/
+package-lock.json
+
+# 環境変数
+.env
+.env.*
+!.env.example
+
+# データファイル
+data/
+
+# OS 関連
+.DS_Store
+Thumbs.db
+desktop.ini
+*.DS_Store
+*.swp
+*.swo
+
+# IDE 設定
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ログ
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 一時ファイル
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# 画像（必要なものだけコミット）
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+!hoshi-kissa.png
