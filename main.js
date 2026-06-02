@@ -95,6 +95,7 @@
   var exactTotalCount = readCount(totalElement, "data-total-count");
   var shouldAutoUpdate = totalElement.getAttribute("data-auto-count") === "true";
   var humanSubtract = readCorrection(breakdownElement, "data-human-subtract");
+  var inviteCode = totalElement.getAttribute("data-invite-code") || "a26JJr3hVz";
 
   var lastTotalCount = null;
   var lastUpdatedAt = null;
@@ -134,41 +135,97 @@
     renderCount(totalCount, botCount, formatUpdatedAt(new Date()));
   }
 
-  function fetchStats() {
-    fetch("/api/discord-stats", { cache: "no-store" })
+  function firstFiniteNumber(values) {
+    for (var i = 0; i < values.length; i += 1) {
+      if (values[i] === undefined || values[i] === null || values[i] === "") {
+        continue;
+      }
+
+      var value = Number(values[i]);
+      if (Number.isFinite(value)) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  function parseUpdatedAt(value) {
+    if (!value) {
+      return new Date();
+    }
+
+    var date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date : new Date();
+  }
+
+  function normalizeStats(data) {
+    var totalCount = firstFiniteNumber([
+      data.total,
+      data.member_count,
+      data.approximate_member_count,
+      data.profile && data.profile.member_count
+    ]);
+    var apiBotCount = firstFiniteNumber([data.bot, data.bot_count]);
+
+    if (totalCount === null) {
+      throw new Error("Discordの人数取得結果が不正です");
+    }
+
+    return {
+      total: Math.max(0, Math.floor(totalCount)),
+      bot: apiBotCount === null ? botCount : Math.max(0, Math.floor(apiBotCount)),
+      updatedAt: parseUpdatedAt(data.updatedAt)
+    };
+  }
+
+  function fetchJson(url) {
+    return fetch(url, { cache: "no-store" })
       .then(function (response) {
         if (!response.ok) {
           throw new Error("Discordの人数取得に失敗しました (status: " + response.status + ")");
         }
+
         return response.json();
       })
-      .then(function (data) {
-        var totalCount = Number(data.total || 0);
-        var botCount = Number(data.bot || 0);
+      .then(normalizeStats);
+  }
 
-        if (!Number.isFinite(totalCount)) {
-          throw new Error("Discordの人数取得結果が不正です");
-        }
+  function renderStats(stats) {
+    renderCount(stats.total, stats.bot, formatUpdatedAt(stats.updatedAt));
+    lastTotalCount = stats.total;
+    totalElement.setAttribute("data-discord-count-status", "ok");
+    breakdownElement.setAttribute("data-discord-count-status", "ok");
+  }
 
-        lastTotalCount = totalCount;
-        updateCount(totalCount, botCount);
-        totalElement.setAttribute("data-discord-count-status", "ok");
-        breakdownElement.setAttribute("data-discord-count-status", "ok");
-      })
+  function renderUnavailable() {
+    if (exactTotalCount !== null) {
+      updateCount(exactTotalCount, botCount);
+      return;
+    }
+
+    totalElement.textContent = "現在の合計参加人数：取得できませんでした";
+    breakdownElement.textContent = "Bot：" + botCount + "人・人間：取得できませんでした";
+  }
+
+  function fetchStats() {
+    var endpoints = [
+      "/api/discord-stats",
+      "./data/bot-count.json",
+      "https://discord.com/api/v10/invites/" + encodeURIComponent(inviteCode) + "?with_counts=true"
+    ];
+
+    endpoints.reduce(function (chain, endpoint) {
+      return chain.catch(function () {
+        return fetchJson(endpoint);
+      });
+    }, Promise.reject())
+      .then(renderStats)
       .catch(function (err) {
         console.warn("Discord人数取得エラー:", err.message);
         totalElement.setAttribute("data-discord-count-status", "error");
         breakdownElement.setAttribute("data-discord-count-status", "error");
-        
-        // エラー時はフォールバック（手動設定値を使用）
-        if (shouldAutoUpdate) {
-           // 手動設定値がある場合はそれを使う
-           var manualBotCount = readCount(breakdownElement, "data-bot-count") || 0;
-           var manualTotal = readCount(totalElement, "data-total-count");
-           if (manualTotal !== null) {
-             updateCount(manualTotal, manualBotCount);
-           }
-        }
+        renderUnavailable();
       });
   }
 
