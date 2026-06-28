@@ -46,3 +46,6 @@ yarn-error.log*
 *.svg
 !hoshi-kissa.png
 !bot-count.json
+
+# その他
+*.ps1
