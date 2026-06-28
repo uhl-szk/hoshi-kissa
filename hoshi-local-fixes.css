@@ -33,6 +33,7 @@
 }
 
 body {
+  font-family: "Yu Gothic", "YuGothic", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
   overflow: auto;
   padding-top: 0;
 }
