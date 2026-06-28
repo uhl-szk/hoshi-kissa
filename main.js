@@ -210,8 +210,7 @@
 
   function fetchStats() {
     var endpoints = [
-      "/api/discord-stats",
-      "./data/bot-count.json",
+      "./bot-count.json",
       "https://discord.com/api/v10/invites/" + encodeURIComponent(inviteCode) + "?with_counts=true"
     ];
 
