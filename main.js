@@ -63,42 +63,12 @@
     return;
   }
 
-  function readCount(element, attributeName) {
-    var value = element.getAttribute(attributeName);
-
-    if (value === null || value === "") {
-      return null;
-    }
-
-    // まずそのまま数値化を試みる
-    var count = Number(value);
-    if (Number.isFinite(count)) {
-      return count;
-    }
-
-    // 数字が混在する文字列の場合、最初の連続した数字列を抽出して数値化する
-    var m = String(value).match(/\d+/);
-    if (m) {
-      var n = Number(m[0]);
-      return Number.isFinite(n) ? n : null;
-    }
-
-    return null;
-  }
-
-  function readCorrection(element, attributeName) {
-    var count = readCount(element, attributeName);
-    return count === null ? 0 : Math.max(0, Math.floor(count));
-  }
-
-  var botCount = readCount(breakdownElement, "data-bot-count") || 0;
-  var exactTotalCount = readCount(totalElement, "data-total-count");
   var shouldAutoUpdate = totalElement.getAttribute("data-auto-count") === "true";
-  var humanSubtract = readCorrection(breakdownElement, "data-human-subtract");
   var inviteCode = totalElement.getAttribute("data-invite-code") || "a26JJr3hVz";
-
-  var lastTotalCount = null;
-  var lastUpdatedAt = null;
+  var snapshotMaxAgeMs = 60 * 60 * 1000;
+  var requestTimeoutMs = 10 * 1000;
+  var lastStats = null;
+  var inFlight = false;
 
   function formatUpdatedAt(date) {
     var parts = new Intl.DateTimeFormat("ja-JP", {
@@ -116,71 +86,53 @@
     return parts.month + "/" + parts.day + " " + parts.hour + ":" + parts.minute;
   }
 
-  function calculateHumanCount(totalCount, botCount) {
-    return Math.max(totalCount - botCount - humanSubtract, 0);
-  }
-
-  function renderCount(totalCount, botCount, updatedAt) {
-    var humanCount = calculateHumanCount(totalCount, botCount);
-    var displayTotal = botCount + humanCount;
-    var totalSubtract = Math.max(totalCount - displayTotal, 0);
-    totalElement.setAttribute("data-subtract", String(totalSubtract));
-
-    totalElement.textContent = "現在の合計参加人数：" + displayTotal + "人 (" + updatedAt + "更新)";
-    breakdownElement.textContent = "Bot：" + botCount + "人・人間：" + humanCount + "人";
-    lastUpdatedAt = updatedAt;
-  }
-
-  function updateCount(totalCount, botCount) {
-    renderCount(totalCount, botCount, formatUpdatedAt(new Date()));
-  }
-
-  function firstFiniteNumber(values) {
-    for (var i = 0; i < values.length; i += 1) {
-      if (values[i] === undefined || values[i] === null || values[i] === "") {
-        continue;
-      }
-
-      var value = Number(values[i]);
-      if (Number.isFinite(value)) {
-        return value;
-      }
-    }
-
-    return null;
+  function isCount(value) {
+    return Number.isSafeInteger(value) && value >= 0;
   }
 
   function parseUpdatedAt(value) {
-    if (!value) {
-      return new Date();
+    if (typeof value !== "string" || !value) {
+      return null;
     }
 
     var date = new Date(value);
-    return Number.isFinite(date.getTime()) ? date : new Date();
+    return Number.isFinite(date.getTime()) && date.getTime() <= Date.now() ? date : null;
   }
 
-  function normalizeStats(data) {
-    var totalCount = firstFiniteNumber([
-      data.total,
-      data.member_count,
-      data.approximate_member_count,
-      data.profile && data.profile.member_count
-    ]);
-    var apiBotCount = firstFiniteNumber([data.bot, data.bot_count]);
-
-    if (totalCount === null) {
-      throw new Error("Discordの人数取得結果が不正です");
+  function normalizeSnapshot(data) {
+    if (!data || !isCount(data.total) || !isCount(data.bot) || !isCount(data.human) ||
+        data.total !== data.bot + data.human) {
+      throw new Error("Discordの人数データが不正です");
     }
 
     return {
-      total: Math.max(0, Math.floor(totalCount)),
-      bot: apiBotCount === null ? botCount : Math.max(0, Math.floor(apiBotCount)),
+      total: data.total,
+      bot: data.bot,
+      human: data.human,
+      approximate: false,
       updatedAt: parseUpdatedAt(data.updatedAt)
     };
   }
 
+  function normalizeInvite(data) {
+    if (!data || !isCount(data.approximate_member_count)) {
+      throw new Error("Discordの概数取得結果が不正です");
+    }
+
+    return {
+      total: data.approximate_member_count,
+      approximate: true,
+      updatedAt: new Date()
+    };
+  }
+
   function fetchJson(url) {
-    return fetch(url, { cache: "no-store" })
+    var controller = new AbortController();
+    var timeout = setTimeout(function () {
+      controller.abort();
+    }, requestTimeoutMs);
+
+    return fetch(url, { cache: "no-store", signal: controller.signal })
       .then(function (response) {
         if (!response.ok) {
           throw new Error("Discordの人数取得に失敗しました (status: " + response.status + ")");
@@ -188,43 +140,74 @@
 
         return response.json();
       })
-      .then(normalizeStats);
+      .then(function (data) {
+        clearTimeout(timeout);
+        return data;
+      }, function (error) {
+        clearTimeout(timeout);
+        throw error;
+      });
   }
 
-  function renderStats(stats) {
-    renderCount(stats.total, stats.bot, formatUpdatedAt(stats.updatedAt));
-    lastTotalCount = stats.total;
-    totalElement.setAttribute("data-discord-count-status", "ok");
-    breakdownElement.setAttribute("data-discord-count-status", "ok");
+  function renderStats(stats, stale) {
+    var timeLabel = stats.updatedAt ? formatUpdatedAt(stats.updatedAt) + "確認" : "確認日時不明";
+    var prefix = stale ? "最終確認の合計参加人数（Botを含む）：" : "現在の合計参加人数（Botを含む）：";
+    var status = stale ? "stale" : stats.approximate ? "approximate" : "ok";
+
+    totalElement.textContent = prefix + (stats.approximate ? "約" : "") + stats.total + "人 (" +
+      timeLabel + (stale ? "・更新停止" : "") + ")";
+    breakdownElement.textContent = stats.approximate
+      ? "Bot・人間の内訳：取得できません（合計は概数）"
+      : "Bot：" + stats.bot + "人・人間：" + stats.human + "人";
+    totalElement.setAttribute("data-discord-count-status", status);
+    breakdownElement.setAttribute("data-discord-count-status", status);
   }
 
   function renderUnavailable() {
-    if (exactTotalCount !== null) {
-      updateCount(exactTotalCount, botCount);
+    if (lastStats) {
+      renderStats(lastStats, true);
       return;
     }
 
     totalElement.textContent = "現在の合計参加人数：取得できませんでした";
-    breakdownElement.textContent = "Bot：" + botCount + "人・人間：取得できませんでした";
+    breakdownElement.textContent = "Bot・人間の内訳：取得できませんでした";
+    totalElement.setAttribute("data-discord-count-status", "error");
+    breakdownElement.setAttribute("data-discord-count-status", "error");
   }
 
   function fetchStats() {
-    var endpoints = [
-      "./bot-count.json",
-      "https://discord.com/api/v10/invites/" + encodeURIComponent(inviteCode) + "?with_counts=true"
-    ];
+    if (inFlight) {
+      return;
+    }
 
-    endpoints.reduce(function (chain, endpoint) {
-      return chain.catch(function () {
-        return fetchJson(endpoint);
-      });
-    }, Promise.reject())
-      .then(renderStats)
+    inFlight = true;
+    fetchJson("./bot-count.json")
+      .then(normalizeSnapshot)
+      .then(function (stats) {
+        if (!lastStats || (stats.updatedAt && (!lastStats.updatedAt || stats.updatedAt > lastStats.updatedAt))) {
+          lastStats = stats;
+        }
+
+        if (!stats.updatedAt || Date.now() - stats.updatedAt.getTime() > snapshotMaxAgeMs) {
+          throw new Error("Discordの人数データの更新が停止しています");
+        }
+
+        return stats;
+      })
+      .catch(function () {
+        return fetchJson("https://discord.com/api/v10/invites/" + encodeURIComponent(inviteCode) + "?with_counts=true")
+          .then(normalizeInvite);
+      })
+      .then(function (stats) {
+        lastStats = stats;
+        renderStats(stats, false);
+      })
       .catch(function (err) {
         console.warn("Discord人数取得エラー:", err.message);
-        totalElement.setAttribute("data-discord-count-status", "error");
-        breakdownElement.setAttribute("data-discord-count-status", "error");
         renderUnavailable();
+      })
+      .then(function () {
+        inFlight = false;
       });
   }
 
