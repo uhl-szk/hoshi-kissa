@@ -5,10 +5,10 @@ const test = require('node:test');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const script = path.join(root, 'count-bot.js');
+const script = path.join(root, 'discord-count-bot.js');
 const source = fs.readFileSync(script, 'utf8');
 const dataFile = path.join(root, 'data', 'bot-count.json');
-const siteScript = path.resolve(root, '..', 'hoshi-kissa', 'count-bot.js');
+const siteScript = path.resolve(root, '..', 'hoshi-kissa', 'sync-bot-count.js');
 
 function collection(botFlags) {
   const entries = new Map(botFlags.map((bot, index) => [String(index), { user: { bot } }]));

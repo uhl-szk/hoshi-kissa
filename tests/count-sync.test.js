@@ -11,7 +11,7 @@ test('count publishing preserves freshness and retries a failed push with unchan
   const remote = path.join(root, 'remote.git');
   const source = path.join(root, 'source.json');
   fs.mkdirSync(repo);
-  fs.copyFileSync(path.resolve(__dirname, '..', '..', 'hoshi-kissa', 'count-bot.js'), path.join(repo, 'count-bot.js'));
+  fs.copyFileSync(path.resolve(__dirname, '..', 'sync-bot-count.js'), path.join(repo, 'sync-bot-count.js'));
 
   function git(args, cwd = repo) {
     const result = spawnSync('git', args, { cwd, encoding: 'utf8', windowsHide: true });
@@ -20,7 +20,7 @@ test('count publishing preserves freshness and retries a failed push with unchan
   }
   function publish(data, expectedStatus = 0) {
     fs.writeFileSync(source, JSON.stringify(data));
-    const result = spawnSync(process.execPath, ['count-bot.js', '--once'], {
+    const result = spawnSync(process.execPath, ['sync-bot-count.js', '--once'], {
       cwd: repo,
       encoding: 'utf8',
       windowsHide: true,
